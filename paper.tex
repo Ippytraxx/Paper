@@ -5,7 +5,7 @@
 \newcommand{\degree}{$^\circ$}
 
 \section{Introduction}
-Tree volume measurement is one of the many parameters used when documenting and profiling trees and is at the center of forest inventory.Estimates of tree volume are important for planning timber harvests and modelling carbon sequestration. The need for information about Earth's natural resources, including tree volume, has been increasing exponentially in recent times. To be able to accomplish this in forestry, it is a necessity to be able to collect large amounts of data easily and on a regular basis. 
+Tree volume measurement is one of the many parameters used when documenting and profiling trees and is at the center of forest inventory.Estimates of tree volume are important for planning timber harvests and modelling carbon sequestration. The need for information about the natural resources of the Earth, including tree volume, has been increasing exponentially in recent times. To be able to accomplish this in forestry, it is a necessity to be able to collect large amounts of data easily and on a regular basis. 
 
 Unfortunately estimating tree volume is expensive, time consuming and in most cases the data collected doesn't meet today's standards \cite{digital imaged based tree measurement for forest inventory}.
 Most methods used today to measure individual trees are often done manually with a variety of tools. However the use of these analogue approaches does not come without it's downfalls.
@@ -59,6 +59,7 @@ Once all the required information has been retrieved it is piped into the progra
 \end{itemize}
 
 \subsection{Distance to tree}
+\subsubsection{Explanation}
 The DBH is used as a reference to find all the other measurements. The first unknown that must be discovered is the distance to the tree. This distance is parallel with the ground. The difference between the x-coordinates of the left and right pixel that correspond to the DBH is calculated, figure \ref{horizontal_triangle}, $X_1$ and $X_2$. Due to the fact that the width of the DBH is now known in both pixels and in a physical measurement (from figure \ref{input} where the user typed it in), the ratio between the two can be determined by dividing the physical distance between $X_1$ and $X_2$ with the number of pixels between them. For example if the width of the tree is 100 pixels and its real life width is 50 centimeters then ratio is 0.5 cm per pixel.
 \begin{figure}[htp]
 \centering
@@ -68,10 +69,29 @@ The DBH is used as a reference to find all the other measurements. The first unk
 	\label{horizontal_triangle}
 }
 \end{figure}
- As seen in figure \ref{horizontal_triangle} an isosceles triangle can be constructed with the horizontal angle of view as the vertex angle. The triangles two congruent legs extend out towards the base of the triangle, $W_1$, which is inline with the tree. To get the length of the base, $W_1$, the previously calculated scale between pixels and the real world is multiplied with the number of pixels in the horizontal resolution of the image. The distance to the tree can easily calculated by drawing an extra line that bisects the vertex angle, resulting in an angle, $\theta$, which is exactly half of the angle of view and the actual distance to the tree $d$. This line also divides $W_1$ into $W_2$ and futhermore produces a right angle triangle that can be solved. Finally to actually calculate the distance, $d$, $W_2$ is divided by $\tan{\theta}$.
+ As seen in figure \ref{horizontal_triangle} an isosceles triangle can be constructed with the horizontal angle of view as the vertex angle. The triangles two congruent legs extend out towards the base of the triangle, $W_1$, which is inline with the tree. To get the length of the base, $W_1$, the previously calculated scale between pixels and the real world is multiplied with the number of pixels in the horizontal resolution of the image, Eq. \ref{w1}. The distance to the tree can easily calculated by drawing an extra line that bisects the vertex angle, resulting in an angle, $\theta$, which is exactly half of the angle of view and the actual distance to the tree $d$. This line also divides $W_1$ into $W_2$, Eq. \ref{w2}, and futhermore produces a right angle triangle that can be solved. Finally to actually calculate the distance, $d$, $W_2$ is divided by $\tan{\theta}$, Eq. \ref{d}.
+ 
+ \subsubsection{Equations}
+ \begin{itemize}
+	\item $Hr$: Horizontal resolution.
+	\item $DBH$: Diameter at Breast Height.
+\end{itemize}
 
+\begin{equation}
+	W_1 = \frac{DBH}{(X_1 - X_2)} \times Hr
+	\label{w1}
+\end{equation}
+\begin{equation}
+	W_2 = \frac{W_1}{2}
+	\label{w2}
+\end{equation}
+\begin{equation}
+	d = \frac{W_2}{\tan{\theta}}
+	\label{d}
+\end{equation}
 
 \subsection{Heights and widths} 
+\subsubsection{Explanation}
 \begin{figure}[!htb]
 	\minipage{0.45\textwidth}
 		\centering
@@ -87,11 +107,57 @@ The DBH is used as a reference to find all the other measurements. The first unk
 	\endminipage\hfill
 \end{figure}
 
-The next stage is retrieving the real world height to each set of pixel coordinates as well as the width between them, which will be the diameter of the tree. The first step taken is to get the height. The vertical image plate scale, which is the ratio between degrees and pixels in the vertical axis, is calculated by dividing the vertical resolution of the image with the vertical angle of view. For example if the vertical angle of view is 60 degrees and there are 3000 pixels in the vertical resolution then the ratio between the two is 50 pixels per degree. This can be done because it is assumed that the silhouette of the tree is on a plane in the real world which corresponds to the image plane on the camera sensor. Basically the tree doesn't bend towards or from the camera. With this method it is possible to find out the angle to each pixel coordinate, for example $P$ in figure \ref{triangle1} and \ref{triangle2}, in the angle of view. This is angle is denoted by $\theta$ in both figure \ref{triangle1} and \ref{triangle2}. However if the pixel coordinate was identified in the bole image, when the phone was tilted upwards, then angle between the distance to the tree and the lower boundary of the vertical angle of view, $B$, will need to be added, which is represented by $\varphi$ in figure \ref{triangle2}. To calculate the real world height to each set of pixel coordinates, the horizontal distance to the tree, $d$ in figure \ref{horizontal_triangle}, is multiplied wtih the angle to the pixel coordinate. In the DBH picture this angle is just $\theta$ and in the bole picture it is $\theta + \varphi$. The diagonal distance to $P$ is also calculated so that the width can later be determined.
+The next stage is retrieving the real world height to each set of pixel coordinates as well as the width between them, which will be the diameter of the tree. The first step taken is to get the height. The vertical image plate scale, which is the ratio between degrees and pixels in the vertical axis, is calculated by dividing the vertical resolution of the image with the vertical angle of view, Eq. \ref{ips}. For example if the vertical angle of view is 60 degrees and there are 3000 pixels in the vertical resolution then the ratio between the two is 50 pixels per degree. This can be done because it is assumed that the silhouette of the tree is on a plane in the real world which corresponds to the image plane on the camera sensor. Basically the tree doesn't bend towards or from the camera. With this method it is possible to find out the angle to each pixel coordinate, for example $P$ in figure \ref{triangle1} and \ref{triangle2}, in the angle of view by dividing its Y position by the image plate scale, Eq. \ref{theta}. This is angle is denoted by $\theta$ in both figure \ref{triangle1} and \ref{triangle2}. However if the pixel coordinate was identified in the bole image, when the phone was tilted upwards, then angle between the distance to the tree and the lower boundary of the vertical angle of view, $B$, will need to be added, which is represented by $\varphi$ in figure \ref{triangle2}, Eq. \ref{varphi}. To calculate the real world height to each set of pixel coordinates, the horizontal distance to the tree, $d$ in figure \ref{horizontal_triangle}, is multiplied with tan of the angle. In the DBH picture this angle is just $\theta$ and in the bole picture it is $\theta + \varphi$, Eq. \ref{py1} or Eq. \ref{py2}. The diagonal distance to $P$ is also calculated so that the width can later be determined, Eq. \ref{Dd1} or Eq. \ref{Dd2}.
 
-The final part of obataining the parameters for each set of pixel coordinates is to calculate the width between them. This is accomplished by employing the method for calculating the distance to the tree, in reverse. In this case what is known in figure \ref{horizontal_triangle} is the distance $d$, which was the diagonal distance to P, and the angle $\theta$ but not the width of the tree, $X_1$ to $X_2$. $W_2$ is calculated by multiplying $d$ with $\tan{\varphi}$. $W_2$ is then again multiplied by 2, to give $W_1$, and then divided by the number of pixels in the horizontal resolution of the image, once more returning the ratio between pixels and the corresponding real world measurement. To finish off this ratio is the multiplied by the number of pixels between $X_1$ and $X_2$ resulting in the physical width of the tree at that certain height.
+The final part of obataining the parameters for each set of pixel coordinates is to calculate the width between them. This is accomplished by employing the method for calculating the distance to the tree, in reverse. In this case what is known in figure \ref{horizontal_triangle} is the distance $d$ which is actually the diagonal distance to $P$, and the angle $\theta$ but not the width of the tree, $X_1$ to $X_2$. $W_2$ is calculated by multiplying $d$ with $\tan{\theta}$, Eq. \ref{w2a}. $W_2$ is then again multiplied by 2, to give $W_1$, and then divided by the number of pixels in the horizontal resolution of the image, once more returning the ratio between pixels and the corresponding real world measurement. To finish off this ratio is the multiplied by the number of pixels between $X_1$ and $X_2$ resulting in the physical width of the tree at that certain height, Eq. \ref{widtheq}.
 
+\subsubsection{Equations}
+\begin{itemize}
+	\item $Vav$: Vertical angle of view
+	\item $Vr$: Vertical resolution
+	\item $Ips$: Image plate scale
+	\item $H$: Height to pixel coordinate
+	\item $Vta$: Vertical tilt angle (pitch)
+	\item $Dd$: Diagonal distance to $P$
+\end{itemize}
 
+\begin{equation}
+	Ips = \frac{Vr}{Vav}
+	\label{ips}
+\end{equation}
+\begin{equation}
+	\theta = \frac{Py}{Ips}
+	\label{theta}
+\end{equation}
+\begin{equation}
+	\varphi = Vta - Vav
+	\label{varphi}
+\end{equation}
+\begin{equation}
+	H = d \times \tan{\theta}
+	\label{py1}
+\end{equation}
+\begin{equation}
+	H = d \times \tan{(\theta + \varphi)}
+	\label{py2}
+\end{equation}
+\begin{equation}
+	Dd = \frac{d}{\cos{\theta}}
+	\label{Dd1}
+\end{equation}
+\begin{equation}
+	Dd = \frac{d}{\cos{(\theta + \varphi)}}
+	\label{Dd2}
+\end{equation}
+\begin{equation}
+	W_2 = d \times \tan{\theta}
+	\label{w2a}
+\end{equation}
+\begin{equation}
+	\text{Width of tree} = \frac{W_2 \times 2}{Hr} \times (X_2 - X_1)
+	\label{widtheq}
+\end{equation}
+	
 \subsection{Volume}
 Now the only thing left to produce the final result is to use these newly calculated widths and heights to obtain the total volume. The new calculated heights and lengths are used to calculate a loess curve. A loess curve is a line that is fitted to the input points through local regression. The loess curve is then used to produce a polynomial spline function that can then be used to calculate the diameter at very small height intervals. At each new interval the volume can be calculated and is then added onto the current total volume. This will result in a much more accurate reading than by just numerically intergrating the original points.
 
